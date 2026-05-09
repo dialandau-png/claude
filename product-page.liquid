@@ -1,0 +1,440 @@
+{% comment %}All Well — Custom Product Page{% endcomment %}
+
+<style>
+.aw-page{display:grid!important;grid-template-columns:2fr 1fr!important;height:680px!important;overflow:hidden;max-width:100%!important;padding:0!important;margin:0!important}
+.aw-gallery{display:flex!important;flex-direction:column;border-right:.5px solid rgba(0,0,0,.1);overflow:hidden;height:100%}
+.aw-gallery__viewport{flex:1;overflow:hidden;position:relative}
+.aw-gallery__track{display:flex!important;height:100%;transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.aw-gallery__slide{flex-shrink:0!important;width:80%!important;height:100%;padding:20px 10px 20px 24px}
+.aw-gallery__slide-inner{width:100%;height:100%;border-radius:20px!important;overflow:hidden;background:#f5f5f3}
+.aw-gallery__slide-inner img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;border-radius:20px!important}
+.aw-gallery__bar{flex-shrink:0;height:64px;display:flex!important;align-items:center;justify-content:center;gap:20px;border-top:.5px solid rgba(0,0,0,.1)}
+.aw-gallery__btn{width:40px!important;height:40px!important;min-width:40px!important;border-radius:50%!important;border:.5px solid rgba(0,0,0,.2)!important;background:#fff!important;cursor:pointer;display:flex!important;align-items:center;justify-content:center;padding:0!important;color:#111!important;box-shadow:none!important;line-height:1!important}
+.aw-gallery__btn:hover{background:#f5f5f5!important}
+.aw-gallery__btn svg{display:block}
+.aw-gallery__count{font-size:14px;color:#888;min-width:44px;text-align:center}
+.aw-info{padding:36px 48px!important;overflow-y:auto}
+.aw-breadcrumb{font-size:13px;color:#888;margin-bottom:16px}
+.aw-breadcrumb span{color:#bbb}
+.aw-title{font-size:28px!important;font-weight:500!important;line-height:1.25!important;margin-bottom:10px!important}
+.aw-price-row{display:flex!important;align-items:center;gap:12px;margin-bottom:4px}
+.aw-price{font-size:24px!important;font-weight:500!important}
+.aw-price-old{font-size:15px;color:#aaa!important;text-decoration:line-through}
+.aw-savings{font-size:12px;color:#1a7a4a!important;background:#e6f4ed!important;padding:3px 12px;border-radius:20px}
+.aw-divider{height:.5px!important;background:rgba(0,0,0,.1)!important;border:none!important;margin:16px 0!important}
+
+/* Color groups */
+.aw-color-group{margin-bottom:16px}
+.aw-color-group-label{font-size:12px!important;font-weight:500!important;text-transform:uppercase;letter-spacing:.06em;color:#888!important;margin-bottom:10px}
+.aw-color-group-label span{color:#111;font-weight:500}
+.aw-swatches{display:flex!important;flex-wrap:wrap;gap:10px;margin-bottom:4px}
+.aw-swatch{width:34px!important;height:34px!important;border-radius:50%!important;cursor:pointer;border:2.5px solid transparent!important;position:relative;transition:border .15s;display:inline-block}
+.aw-swatch.active{border-color:#111!important}
+.aw-swatch.oos{position:relative}
+.aw-swatch.oos::after{content:'';position:absolute;top:50%;left:50%;width:130%;height:1.5px;background:rgba(0,0,0,.3);transform:translate(-50%,-50%) rotate(-45deg)}
+.aw-swatch__tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#111;color:#fff;font-size:11px;white-space:nowrap;padding:3px 8px;border-radius:4px;pointer-events:none;z-index:10}
+.aw-swatch:hover .aw-swatch__tip{display:block}
+
+/* Size buttons */
+.aw-size-header{display:flex!important;justify-content:space-between;align-items:center;margin-bottom:10px}
+.aw-label{font-size:12px!important;font-weight:500!important;text-transform:uppercase;letter-spacing:.06em;color:#888!important;margin-bottom:0}
+.aw-size-guide{font-size:13px;color:#888;text-decoration:underline;cursor:pointer}
+.aw-sizes{display:grid!important;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.aw-size{padding:12px 8px!important;border:.5px solid rgba(0,0,0,.15)!important;border-radius:0!important;font-size:13px!important;cursor:pointer;text-align:center;line-height:1.3;background:#fff!important;color:#111!important;transition:all .15s}
+.aw-size:hover{border-color:#111!important}
+.aw-size.active{border:1.5px solid #111!important;font-weight:500!important;background:#111!important;color:#fff!important}
+.aw-size.oos{opacity:.4;cursor:not-allowed;text-decoration:line-through}
+
+.aw-add-row{display:flex!important;gap:10px;margin-bottom:12px}
+.aw-qty{display:flex!important;align-items:center;border:.5px solid rgba(0,0,0,.15)!important;border-radius:10px!important;overflow:hidden}
+.aw-qty__btn{width:46px!important;height:52px!important;display:flex!important;align-items:center;justify-content:center;font-size:22px!important;background:none!important;border:none!important;cursor:pointer;color:#111!important;box-shadow:none!important;border-radius:0!important;padding:0!important}
+.aw-qty__val{width:34px;text-align:center;font-size:16px;font-weight:500}
+.aw-btn-add{flex:1;height:52px!important;background:#111!important;color:#fff!important;border:none!important;border-radius:10px!important;font-size:15px!important;font-weight:500!important;cursor:pointer;display:flex!important;align-items:center;justify-content:center;gap:8px;letter-spacing:.02em;box-shadow:none!important;text-transform:none!important;padding:0 20px!important}
+.aw-btn-add:hover{opacity:.88;background:#111!important}
+.aw-info .shopify-payment-button{margin-bottom:14px!important}
+.aw-info .shopify-payment-button__button--unbranded{background:#111!important;border-radius:10px!important;font-size:15px!important;height:52px!important;font-weight:500!important;box-shadow:none!important}
+.aw-info .shopify-payment-button__button--branded{border-radius:10px!important;min-height:52px!important}
+.aw-impact{display:flex!important;align-items:center;justify-content:center;gap:10px;font-size:13px;color:#666;padding:12px;background:#f5f5f3!important;border-radius:10px!important;margin-bottom:18px;border:none!important}
+.aw-impact strong{color:#111}
+.aw-accordion{border-top:.5px solid rgba(0,0,0,.1)!important}
+.aw-accordion__row{border-bottom:.5px solid rgba(0,0,0,.1)!important}
+.aw-accordion__head{display:flex!important;justify-content:space-between;align-items:center;padding:15px 0!important;cursor:pointer;font-size:14px!important;font-weight:500!important;background:none!important;border:none!important;width:100%;text-align:left;color:#111!important;box-shadow:none!important;border-radius:0!important}
+.aw-accordion__icon{font-size:20px;color:#888}
+.aw-accordion__body{padding-bottom:14px;font-size:13px;color:#666;line-height:1.65;display:none}
+.aw-accordion__body.open{display:block!important}
+.aw-highlight{display:flex!important;gap:12px;padding:12px;background:#f5f5f3!important;border-radius:10px!important;margin-top:6px;align-items:flex-start}
+
+/* Swatch navigating to another page — show a subtle loading ring on click */
+.aw-swatch.navigating{opacity:.6;pointer-events:none}
+
+@media(max-width:768px){
+  .aw-page{grid-template-columns:1fr!important;height:auto!important;overflow:visible!important}
+  .aw-gallery{height:auto!important;border-right:none!important;border-bottom:.5px solid rgba(0,0,0,.1);display:flex!important}
+  .aw-gallery__viewport{min-height:80vw;height:80vw!important}
+  .aw-gallery__track{height:100%!important}
+  .aw-gallery__slide{width:85%!important;padding:12px 8px 12px 12px;height:100%!important}
+  .aw-gallery__slide-inner{height:100%!important;border-radius:12px!important}
+  .aw-gallery__bar{height:52px}
+  .aw-info{padding:20px 16px!important}
+  .aw-title{font-size:22px!important}
+  .aw-price{font-size:20px!important}
+  .aw-sizes{grid-template-columns:repeat(2,1fr)!important}
+  .aw-add-row{flex-direction:row!important;gap:10px}
+  .aw-qty{width:auto!important}
+  .aw-btn-add{height:48px!important}
+}
+</style>
+
+{%- comment -%}
+  COLOR LINKS METAFIELD
+  Create a metafield on each product:
+    Namespace: custom
+    Key:       color_links
+    Type:      JSON
+  Value example:
+    {
+      "Pink":   "/products/aw-sock-pink",
+      "Blue":   "/products/aw-sock-blue",
+      "Black":  "/products/aw-sock-black"
+    }
+  The current product's color will be automatically marked active.
+  Clicking any other swatch navigates to that product URL.
+{%- endcomment -%}
+
+{%- assign color_links_raw = product.metafields.custom.color_links.value -%}
+
+<div class="aw-page">
+  <div class="aw-gallery">
+    <div class="aw-gallery__viewport" id="awViewport">
+      <div class="aw-gallery__track" id="awTrack">
+        {%- for media in product.media -%}
+          <div class="aw-gallery__slide" data-alt="{{ media.alt | downcase | strip }}">
+            <div class="aw-gallery__slide-inner">
+              {%- if media.media_type == 'image' -%}
+                {{ media | image_url: width: 1400 | image_tag: loading: 'lazy', alt: media.alt }}
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+    <div class="aw-gallery__bar">
+      <button class="aw-gallery__btn" id="awPrev" aria-label="Previous">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="aw-gallery__count" id="awCount">1 / {{ product.media.size }}</span>
+      <button class="aw-gallery__btn" id="awNext" aria-label="Next">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="aw-info">
+    <nav class="aw-breadcrumb">
+      {{ product.type | downcase }}<span> / {{ product.title | downcase }}</span>
+    </nav>
+    <h1 class="aw-title">{{ product.title }}</h1>
+    <div class="aw-price-row">
+      {%- if product.compare_at_price > product.price -%}
+        <span class="aw-price">{{ product.price | money }}</span>
+        <span class="aw-price-old">{{ product.compare_at_price | money }}</span>
+        {%- assign savings = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+        <span class="aw-savings">{{ savings }}% pack savings</span>
+      {%- else -%}
+        <span class="aw-price">{{ product.price | money }}</span>
+      {%- endif -%}
+    </div>
+
+    <hr class="aw-divider">
+
+    {%- assign color_option   = product.options_by_name['Color'] -%}
+    {%- assign core_option    = product.options_by_name['Core'] -%}
+    {%- assign limited_option = product.options_by_name['Limited'] -%}
+
+    {%- comment -%}
+      Determine the "current color" for this product page so we can pre-activate
+      the right swatch. We check (in order):
+        1. color_option.values.first  (standard Color option)
+        2. core_option.values.first   (Core option)
+        3. Fall back to product title keyword matching against the color_links keys
+    {%- endcomment -%}
+    {%- assign current_color = color_option.values.first | default: core_option.values.first -%}
+
+    {%- if color_option or color_links_raw -%}
+      <div class="aw-color-group">
+        <div class="aw-color-group-label">Core: <span id="awColorLabel">{{ current_color }}</span></div>
+        <div class="aw-swatches" id="awSwatches">
+
+          {%- comment -%}
+            If a color_links metafield exists we render one swatch per entry,
+            which covers all sibling products. Otherwise fall back to just the
+            values on this product's Color option.
+          {%- endcomment -%}
+
+          {%- if color_links_raw -%}
+            {%- for entry in color_links_raw -%}
+              {%- assign clr  = entry[0] -%}
+              {%- assign curl = entry[1] -%}
+              {%- assign is_current = false -%}
+              {%- if clr == current_color -%}{%- assign is_current = true -%}{%- endif -%}
+
+              {%- comment -%} slide index only meaningful for the current product {%- endcomment -%}
+              {%- assign slide_idx = 0 -%}
+              {%- if is_current and color_option -%}
+                {%- for variant in product.variants -%}
+                  {%- if variant.option1 == clr or variant.option2 == clr or variant.option3 == clr -%}
+                    {%- if variant.featured_image -%}
+                      {%- for media in product.media -%}
+                        {%- if media.id == variant.featured_image.id -%}
+                          {%- assign slide_idx = forloop.index0 -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+                    {%- endif -%}
+                    {%- break -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- endif -%}
+
+              <div class="aw-swatch {% if is_current %}active{% endif %}"
+                   data-color="{{ clr }}"
+                   data-slide="{{ slide_idx }}"
+                   data-url="{% unless is_current %}{{ curl }}{% endunless %}"
+                   style="background:{% case clr %}{% when 'Pink' %}#f4a0b0{% when 'Gray' %}#b0b0b8{% when 'Lavender' %}#c8b8d8{% when 'Beige' %}#d8c0a0{% when 'Yellow' %}#e8d040{% when 'Black' %}#222{% when 'White' %}#f5f5f5{% when 'Blue' %}#8ab4d8{% when 'Navy' %}#1a2d5a{% when 'Green' %}#a8c8a0{% when 'Red' %}#d87070{% when 'Burgundy' %}#6e1f2e{% else %}#ccc{% endcase %}"
+                   title="{{ clr }}">
+                <span class="aw-swatch__tip">{{ clr }}</span>
+              </div>
+            {%- endfor -%}
+
+          {%- elsif color_option -%}
+            {%- comment -%} Fallback: no metafield — behave like original (gallery-only switching) {%- endcomment -%}
+            {%- for value in color_option.values -%}
+              {%- assign slide_idx = 0 -%}
+              {%- for variant in product.variants -%}
+                {%- if variant.option1 == value or variant.option2 == value or variant.option3 == value -%}
+                  {%- if variant.featured_image -%}
+                    {%- for media in product.media -%}
+                      {%- if media.id == variant.featured_image.id -%}
+                        {%- assign slide_idx = forloop.index0 -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                  {%- endif -%}
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+              <div class="aw-swatch {% if forloop.first %}active{% endif %}"
+                   data-color="{{ value }}"
+                   data-slide="{{ slide_idx }}"
+                   style="background:{% case value %}{% when 'Pink' %}#f4a0b0{% when 'Gray' %}#b0b0b8{% when 'Lavender' %}#c8b8d8{% when 'Beige' %}#d8c0a0{% when 'Yellow' %}#e8d040{% when 'Black' %}#222{% when 'White' %}#f5f5f5{% when 'Blue' %}#8ab4d8{% when 'Navy' %}#1a2d5a{% when 'Green' %}#a8c8a0{% when 'Red' %}#d87070{% when 'Burgundy' %}#6e1f2e{% else %}#ccc{% endcase %}"
+                   title="{{ value }}">
+                <span class="aw-swatch__tip">{{ value }}</span>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- if limited_option -%}
+      <div class="aw-color-group">
+        <div class="aw-color-group-label">Limited</div>
+        <div class="aw-swatches">
+          {%- for value in limited_option.values -%}
+            <div class="aw-swatch"
+                 data-color="{{ value }}"
+                 data-group="limited"
+                 style="background:{% case value %}{% when 'Pink' %}#f4a0b0{% when 'Gray' %}#b0b0b8{% when 'Navy' %}#1a2d5a{% when 'Green' %}#4a7a60{% when 'Yellow' %}#e8e060{% when 'Burgundy' %}#6e1f2e{% when 'Sand' %}#d4c4a8{% else %}#ccc{% endcase %}"
+                 title="{{ value }}">
+              <span class="aw-swatch__tip">{{ value }}</span>
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- assign size_option = product.options_by_name['Size'] -%}
+    {%- if size_option -%}
+      <div class="aw-size-header">
+        <div class="aw-label">Size: <span id="awSizeLabel">—</span></div>
+        <a href="#" class="aw-size-guide">Size Guide</a>
+      </div>
+      <div class="aw-sizes">
+        {%- for value in size_option.values -%}
+          {%- assign variant_available = false -%}
+          {%- for variant in product.variants -%}
+            {%- if variant.option1 == value or variant.option2 == value or variant.option3 == value -%}
+              {%- if variant.available -%}
+                {%- assign variant_available = true -%}
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+          <div class="aw-size{% unless variant_available %} oos{% endunless %}"
+               data-size="{{ value }}">
+            {{ value }}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <hr class="aw-divider">
+
+    {%- form 'product', product, id: 'awProductForm' -%}
+      <input type="hidden" name="id" id="awVariantId" value="{{ product.selected_or_first_available_variant.id }}">
+      <div class="aw-add-row">
+        <div class="aw-qty">
+          <button type="button" class="aw-qty__btn" id="awQtyMinus">−</button>
+          <span class="aw-qty__val" id="awQtyVal">1</span>
+          <button type="button" class="aw-qty__btn" id="awQtyPlus">+</button>
+          <input type="hidden" name="quantity" id="awQtyInput" value="1">
+        </div>
+        <button type="submit" name="add" class="aw-btn-add">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          add to bag
+        </button>
+      </div>
+      {{ form | payment_button }}
+    {%- endform -%}
+
+    <div class="aw-impact">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      <span><strong>3 purchased = 3 donated</strong> — every pack gives back</span>
+    </div>
+
+    <div class="aw-accordion">
+      <div class="aw-accordion__row">
+        <button class="aw-accordion__head" type="button">
+          <span>Free shipping over $75 + free returns</span>
+          <span class="aw-accordion__icon">+</span>
+        </button>
+        <div class="aw-accordion__body">Ships within 2–4 business days. Free returns within 30 days.</div>
+      </div>
+      <div class="aw-accordion__row">
+        <button class="aw-accordion__head" type="button">
+          <span>Product highlight</span>
+          <span class="aw-accordion__icon">+</span>
+        </button>
+        <div class="aw-accordion__body open">
+          <div class="aw-highlight">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="flex-shrink:0"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+            <div>
+              <p style="font-weight:500;margin-bottom:3px">Midweight cotton</p>
+              <span>Just enough cush for your everyday shoes.</span>
+            </div>
+          </div>
+          <p style="margin-top:12px">{{ product.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var track  = document.getElementById('awTrack');
+  var slides = track ? Array.from(track.querySelectorAll('.aw-gallery__slide')) : [];
+  var N = slides.length;
+  var cur = 0;
+
+  function go(i) {
+    cur = Math.max(0, Math.min(i, N - 1));
+    track.style.transition = 'none';
+    track.style.transform  = 'translateX(0)';
+    var offset = slides[cur].offsetLeft;
+    requestAnimationFrame(function() {
+      track.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
+      track.style.transform  = 'translateX(-' + offset + 'px)';
+    });
+    document.getElementById('awCount').textContent = (cur + 1) + ' / ' + N;
+  }
+
+  function goToColor(color) {
+    var target = color.toLowerCase().trim();
+    for (var i = 0; i < slides.length; i++) {
+      var alt = (slides[i].dataset.alt || '').toLowerCase().trim();
+      if (alt === target || alt.indexOf(target) !== -1) { go(i); return; }
+    }
+  }
+
+  document.getElementById('awPrev').addEventListener('click', function(){ go(cur - 1); });
+  document.getElementById('awNext').addEventListener('click', function(){ go(cur + 1); });
+
+  var qty = 1;
+  document.getElementById('awQtyMinus').addEventListener('click', function(){
+    qty = Math.max(1, qty - 1);
+    document.getElementById('awQtyVal').textContent  = qty;
+    document.getElementById('awQtyInput').value      = qty;
+  });
+  document.getElementById('awQtyPlus').addEventListener('click', function(){
+    qty++;
+    document.getElementById('awQtyVal').textContent = qty;
+    document.getElementById('awQtyInput').value     = qty;
+  });
+
+  var variants = {{ product.variants | json }};
+  function updateVariant() {
+    var colorEl = document.querySelector('.aw-swatch.active');
+    var sizeEl  = document.querySelector('.aw-size.active');
+    var color   = colorEl ? colorEl.dataset.color : null;
+    var size    = sizeEl  ? sizeEl.dataset.size   : null;
+    var match   = variants.find(function(v){
+      return (!color || v.option1 === color || v.option2 === color || v.option3 === color) &&
+             (!size  || v.option1 === size  || v.option2 === size  || v.option3 === size);
+    });
+    if (match) document.getElementById('awVariantId').value = match.id;
+  }
+
+  document.querySelectorAll('.aw-swatch').forEach(function(sw) {
+    sw.addEventListener('click', function() {
+      if (this.classList.contains('oos')) return;
+
+      var url = this.dataset.url;
+
+      if (url) {
+        // Navigate to the sibling color product page (like Alo Yoga)
+        this.classList.add('navigating');
+        window.location.href = url;
+        return;
+      }
+
+      // Current color — just switch the gallery slide
+      document.querySelectorAll('.aw-swatch').forEach(function(s){ s.classList.remove('active'); });
+      this.classList.add('active');
+      var lbl = document.getElementById('awColorLabel');
+      if (lbl) lbl.textContent = this.dataset.color;
+      go(parseInt(this.dataset.slide, 10) || 0);
+      updateVariant();
+    });
+  });
+
+  document.querySelectorAll('.aw-size').forEach(function(sz) {
+    sz.addEventListener('click', function() {
+      if (this.classList.contains('oos')) return;
+      document.querySelectorAll('.aw-size').forEach(function(s){ s.classList.remove('active'); });
+      this.classList.add('active');
+      var lbl = document.getElementById('awSizeLabel');
+      if (lbl) lbl.textContent = this.dataset.size;
+      updateVariant();
+    });
+  });
+
+  document.querySelectorAll('.aw-accordion__head').forEach(function(h) {
+    h.addEventListener('click', function() {
+      var b  = this.nextElementSibling;
+      var ic = this.querySelector('.aw-accordion__icon');
+      b.classList.toggle('open');
+      if (ic) ic.textContent = b.classList.contains('open') ? '−' : '+';
+    });
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "All Well Product",
+  "tag": "section",
+  "class": "aw-section",
+  "settings": [],
+  "blocks": [],
+  "presets": [{ "name": "All Well Product" }]
+}
+{% endschema %}
